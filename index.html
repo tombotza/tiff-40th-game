@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tiff's 40th 🎉 - Spin the Wheel!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a0933 50%, #0f1854 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 4vw, 1.2rem);
+            color: #ff6ec7;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: min(90vw, 400px);
+            height: min(90vw, 400px);
+            margin: 20px auto;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5),
+                        0 0 80px rgba(255, 0, 255, 0.3);
+            border: 6px solid #fff;
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+
+        .wheel.spinning {
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+        }
+
+        .segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.65rem, 2.5vw, 0.9rem);
+            font-weight: bold;
+            text-align: center;
+            padding: 20px 10px;
+            line-height: 1.2;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 40px solid #ff00ff;
+            filter: drop-shadow(0 0 10px #ff00ff);
+            z-index: 10;
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff00ff, #00ffff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+            z-index: 5;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .center-circle:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .center-circle:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .result-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #1a0933 0%, #0f1854 100%);
+            border: 4px solid #ff00ff;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(255, 0, 255, 0.6);
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .result-title {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        .result-text {
+            font-size: clamp(1.2rem, 5vw, 2rem);
+            color: #fff;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .spin-again-btn {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: none;
+            color: #fff;
+            font-size: clamp(1rem, 4vw, 1.3rem);
+            font-weight: bold;
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .spin-again-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .spin-again-btn:active {
+            transform: scale(0.95);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff00ff;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 99;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .instructions {
+            text-align: center;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            color: #00ffff;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tiff's 40th 🎉</h1>
+    <p class="subtitle">Spin the Wheel of Fortune (or Misfortune!)</p>
+    
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel"></div>
+        <div class="center-circle" id="spinBtn">SPIN</div>
+    </div>
+
+    <p class="instructions">Tap the center to spin!</p>
+
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-box">
+            <div class="result-title">🎊 You Got 🎊</div>
+            <div class="result-text" id="resultText"></div>
+            <button class="spin-again-btn" id="spinAgainBtn">Spin Again!</button>
+        </div>
+    </div>
+
+    <script>
+        const segments = [
+            { text: 'Have a shot! 🥃', color: '#ff006e' },
+            { text: 'Free pass! 🎉', color: '#06ffa5' },
+            { text: 'Have 2 shots! 🥃🥃', color: '#ffbe0b' },
+            { text: 'Everyone drinks! 🍻', color: '#8338ec' },
+            { text: 'Down a beer! 🍺', color: '#fb5607' },
+            { text: 'Drink with the birthday girl! 🎂', color: '#ff006e' },
+            { text: 'Pass one on! 👉', color: '#06ffa5' },
+            { text: 'Make a rule! 📜', color: '#3a86ff' },
+            { text: 'Waterfall! 🌊', color: '#8338ec' },
+            { text: 'Switch drinks! 🔄', color: '#ffbe0b' },
+            { text: 'Truth or drink! 🤔', color: '#ff006e' },
+            { text: 'Thumb master! 👍', color: '#06ffa5' },
+            { text: 'Never have I ever! 🙊', color: '#fb5607' },
+            { text: 'Selfie with birthday girl! 🤳', color: '#3a86ff' },
+            { text: 'Categories! 🎯', color: '#8338ec' },
+            { text: 'Compliment Tiff or drink! 💕', color: '#ffbe0b' }
+        ];
+
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const resultOverlay = document.getElementById('resultOverlay');
+        const resultText = document.getElementById('resultText');
+        const spinAgainBtn = document.getElementById('spinAgainBtn');
+
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // Create wheel segments
+        const segmentAngle = 360 / segments.length;
+        segments.forEach((segment, index) => {
+            const segmentEl = document.createElement('div');
+            segmentEl.className = 'segment';
+            segmentEl.style.background = segment.color;
+            segmentEl.style.transform = `rotate(${index * segmentAngle}deg) skewY(${-90 + segmentAngle}deg)`;
+            segmentEl.innerHTML = `<span style="transform: skewY(${90 - segmentAngle}deg) rotate(${segmentAngle/2}deg); display: block;">${segment.text}</span>`;
+            wheel.appendChild(segmentEl);
+        });
+
+        function spin() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const spinRotations = 5 + Math.random() * 3; // 5-8 full rotations
+            const randomDegree = Math.random() * 360;
+            const totalRotation = currentRotation + (spinRotations * 360) + randomDegree;
+
+            wheel.style.transform = `rotate(${totalRotation}deg)`;
+            currentRotation = totalRotation % 360;
+
+            setTimeout(() => {
+                const normalizedRotation = (360 - (currentRotation % 360)) % 360;
+                const segmentIndex = Math.floor(normalizedRotation / segmentAngle) % segments.length;
+                showResult(segments[segmentIndex].text);
+                isSpinning = false;
+            }, 5000);
+        }
+
+        function showResult(result) {
+            resultText.textContent = result;
+            resultOverlay.classList.add('show');
+            createConfetti();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff00ff', '#00ffff', '#ffbe0b', '#ff006e', '#06ffa5', '#8338ec'];
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 5000);
+                }, i * 20);
+            }
+        }
+
+        function hideResult() {
+            resultOverlay.classList.remove('show');
+        }
+
+        spinBtn.addEventListener('click', spin);
+        spinAgainBtn.addEventListener('click', hideResult);
+        resultOverlay.addEventListener('click', (e) => {
+            if (e.target === resultOverlay) hideResult();
+        });
+
+        // Prevent zoom on double tap for better mobile experience
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
